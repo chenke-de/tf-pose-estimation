@@ -8,6 +8,7 @@ from threading import Lock
 import rospy
 import rospkg
 import tensorflow as tf
+import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
