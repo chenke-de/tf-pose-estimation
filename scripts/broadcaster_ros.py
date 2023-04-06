@@ -60,8 +60,12 @@ def callback_image(data):
     msg.image_h = data.height
     msg.header = data.header
 
-    pub_pose.publish(msg)
-
+    if data.header.frame_id == "/csi_cam_0_link":
+        pub_pose.publish(msg)
+    elif data.header.frame_id == "/csi_cam_1_link":
+        pub_pose_right.publish(msg)
+    elif data.header.frame_id == "/csi_cam_5_link":
+        pub_pose_left.publish(msg)
 
 if __name__ == '__main__':
     rospy.loginfo('initialization+')
@@ -69,6 +73,9 @@ if __name__ == '__main__':
 
     # parameters
     image_topic = rospy.get_param('~camera', '')
+    image_front_topic = rospy.get_param('~camera_front', '')
+    image_right_topic = rospy.get_param('~camera_right', '')
+    image_left_topic = rospy.get_param('~camera_left', '')
     model = rospy.get_param('~model', 'cmu')
 
     resolution = rospy.get_param('~resolution', '432x368')
@@ -97,8 +104,12 @@ if __name__ == '__main__':
         pose_estimator = TfPoseEstimator(graph_path, target_size=(w, h))
     cv_bridge = CvBridge()
 
-    rospy.Subscriber(image_topic, Image, callback_image, queue_size=1, buff_size=2**24)
+    rospy.Subscriber(image_front_topic, Image, callback_image, queue_size=1, buff_size=2**24)
+    rospy.Subscriber(image_right_topic, Image, callback_image, queue_size=1, buff_size=2**24)
+    rospy.Subscriber(image_left_topic, Image, callback_image, queue_size=1, buff_size=2**24)
     pub_pose = rospy.Publisher('~pose', Persons, queue_size=1)
+    pub_pose_right = rospy.Publisher('~pose_right', Persons, queue_size=1)
+    pub_pose_left = rospy.Publisher('~pose_left', Persons, queue_size=1)
 
     rospy.loginfo('start+')
     rospy.spin()
